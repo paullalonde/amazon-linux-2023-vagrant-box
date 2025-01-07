@@ -11,6 +11,11 @@ pushd "${TEMP_DIR}" >/dev/null
 BOX_DIR=box
 SETUP_JSON=setup.json
 
+BOX_VERSION=$(jq <"${SETUP_JSON}" -r '.version')
+BOX_ARCHITECTURE=$(jq <"${SETUP_JSON}" -r '.architecture')
+
+echo "## Building box for Amazon Linux 2023 ${BOX_VERSION} ${BOX_ARCHITECTURE}"
+
 mkdir -p "${BOX_DIR}"
 rm -rf "${BOX_DIR:?}"/*
 

@@ -20,6 +20,19 @@ rm -rf "${TEMP_DIR:?}"/*
 OS_NAME=$(uname -s | tr '[:upper:]' '[:lower:]')
 OS_ARCH=$(uname -m | tr '[:upper:]' '[:lower:]')
 
+SETUP_YAML=setup.yaml
+SETUP_JSON="${TEMP_DIR}/setup.json"
+
+yq -o json "${SETUP_YAML}" | 
+    jq --from-file "${BASE_DIR}/templates/setup.jq" \
+        --arg arch "${OS_ARCH}" \
+        >"${SETUP_JSON}"
+
+VM_VERSION=$(jq <"${SETUP_JSON}" -r '.version')
+VM_ARCHITECTURE=$(jq <"${SETUP_JSON}" -r '.architecture')
+
+echo "## Provisioning Amazon Linux 2023 ${VM_VERSION} ${VM_ARCHITECTURE}"
+
 echo "## Locating QEMU ..."
 
 QEMU_INSTALL_JSON="${TEMP_DIR}/qemu-install.json"
@@ -64,17 +77,9 @@ QEMU_BIN_DIR="${QEMU_DIR}/bin"
 QEMU_SHARE_DIR="${QEMU_DIR}/share/qemu"
 QEMU_BINARY="${QEMU_BIN_DIR}/${QEMU_BINARY_NAME}"
 
-SETUP_YAML=setup.yaml
-SETUP_JSON="${TEMP_DIR}/setup.json"
-
-yq -o json "${SETUP_YAML}" | 
-    jq --from-file "${BASE_DIR}/templates/setup.jq" \
-        --arg arch "${OS_ARCH}" \
-        >"${SETUP_JSON}"
-
 IMAGE_DIR="${IMAGE_DIR:-${HOME}/Downloads}"
-IMAGE_NAME=$(jq <"${SETUP_JSON}" -r '"al2023-kvm-\(.image.version)-kernel-6.1-\(.architecture).xfs.gpt.qcow2"')
-IMAGE_URL=$(jq <"${SETUP_JSON}" -r --arg name "${IMAGE_NAME}" '"https://cdn.amazonlinux.com/al2023/os-images/\(.image.version)/kvm-\(.architecture)/\($name)"')
+IMAGE_NAME=$(jq <"${SETUP_JSON}" -r '"al2023-kvm-\(.version)-kernel-6.1-\(.architecture).xfs.gpt.qcow2"')
+IMAGE_URL=$(jq <"${SETUP_JSON}" -r --arg name "${IMAGE_NAME}" '"https://cdn.amazonlinux.com/al2023/os-images/\(.version)/kvm-\(.architecture)/\($name)"')
 IMAGE_PATH="${IMAGE_DIR}/${IMAGE_NAME}"
 
 echo "## Copying source disk image ..."

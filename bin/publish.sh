@@ -13,6 +13,12 @@ fi
 
 pushd "${TEMP_DIR}" >/dev/null
 
+SETUP_JSON=setup.json
+VERSION=$(jq <"${SETUP_JSON}" -r '.version')
+ARCHITECTURE=$(jq <"${SETUP_JSON}" -r '.architecture')
+
+echo "## Publishing box for Amazon Linux 2023 ${VERSION} ${ARCHITECTURE}"
+
 echo "## Authenticating ..."
 
 HCP_CREDENTIALS_JSON=credentials.json
@@ -30,9 +36,7 @@ ACCESS_TOKEN=$(jq <"${HCP_CREDENTIALS_JSON}" -r '.access_token')
 REGISTRY=paullalonde
 BOX=amazon-linux-2023
 ARCHIVE_NAME="box.tgz"
-VERSION=$(jq <setup.json -r '.version')
 PROVIDER=$(jq <box/metadata.json -r '.provider')
-ARCHITECTURE=$(jq <setup.json -r '.architecture')
 
 echo "## Creating Version ..."
 
