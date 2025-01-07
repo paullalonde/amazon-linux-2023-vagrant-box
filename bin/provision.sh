@@ -115,7 +115,6 @@ BOOT_FILE="${QEMU_SHARE_DIR}/${BOOT_NAME}.fd"
 VM_UUID=$(uuidgen)
 
 QEMU_ARGS=(
-    # -L "${HOME}/Library/Containers/com.utmapp.UTM/Data/Library/Caches/qemu" 
     -name "amazon-linux-2023-${VM_UUID}"
     -uuid "${VM_UUID}" 
     -nodefaults 
@@ -128,7 +127,6 @@ QEMU_ARGS=(
     -device "virtio-net-pci,mac=02:2B:4F:2B:10:77,netdev=net0" 
     -netdev "user,id=net0,hostfwd=tcp::${SSH_PORT}-:22" 
     -drive "if=pflash,format=raw,unit=0,file.filename=${BOOT_FILE},file.locking=off,readonly=on" 
-    # -drive "if=pflash,unit=1,file=${HOME}/Library/Containers/com.utmapp.UTM/Data/Documents/testmv2.utm/Data/efi_vars.fd"
     -device "virtio-blk-pci,drive=boot,bootindex=0"
     -drive "if=none,media=disk,id=boot,file.filename=${DISK_IMAGE}"
     -device "virtio-blk-pci,drive=seed,bootindex=1"

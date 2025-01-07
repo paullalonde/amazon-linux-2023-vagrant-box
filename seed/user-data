@@ -11,4 +11,4 @@ users:
     plain_text_passwd: root
     lock_passwd: False
     ssh_authorized_keys:
-      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGhVpFvvTAze868y+9od3SEVPOs27jZ3XQKNq/NXga6g root@localhost
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGhVpFvvTAze868y+9od3SEVPOs27jZ3XQKNq/NXga6g root insecure public key

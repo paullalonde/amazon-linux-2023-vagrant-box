@@ -14,9 +14,7 @@ function kill_process() {
 SELF_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASE_DIR="${SELF_DIR}/.."
 TEMP_DIR="${BASE_DIR}/.temp"
-BOX_DIR="${TEMP_DIR}/box"
-BOX_IMAGE="${BOX_DIR}/box.img"
-# DISK_IMAGE="${TEMP_DIR}/disk.qcow2"
+DISK_IMAGE="${TEMP_DIR}/disk.qcow2"
 QEMU_INSTALL_JSON="${TEMP_DIR}/qemu-install.json"
 
 OS_ARCH=$(uname -m | tr '[:upper:]' '[:lower:]')
@@ -82,9 +80,7 @@ QEMU_ARGS=(
     -drive "if=pflash,format=raw,unit=0,file.filename=${BOOT_FILE},file.locking=off,readonly=on" 
     # -drive "if=pflash,unit=1,file=${HOME}/Library/Containers/com.utmapp.UTM/Data/Documents/testmv2.utm/Data/efi_vars.fd" 
     -device "virtio-blk-pci,drive=boot,bootindex=0"
-    -drive "if=none,media=disk,id=boot,file.filename=${BOX_IMAGE}"
-    # -device "virtio-blk-pci,drive=seed,bootindex=1" 
-    # -drive "if=none,media=cdrom,id=seed,file.filename=${SEED_ISO}" 
+    -drive "if=none,media=disk,id=boot,file.filename=${DISK_IMAGE}"
     -serial chardev:con
     -chardev "stdio,id=con,mux=on"
     # -chardev "file,id=con,mux=on,path=${TEMP_DIR}/test-console.log"
@@ -103,59 +99,3 @@ VM_PID=$!
 echo "## VM PID: ${VM_PID}"
 
 trap 'kill_process ${VM_PID}' EXIT
-
-# echo "## Waiting for SSH to be ready ..."
-# sleep 2
-
-# SSH_ARGS=(
-#     -o UserKnownHostsFile=/dev/null
-#     -o "StrictHostKeyChecking no"
-#     -o "LogLevel ERROR"
-#     -i "${BASE_DIR}/keys/vagrant.key.ed25519"
-#     -p "${SSH_PORT}" \
-#     vagrant@localhost \
-# )
-
-# ssh "${SSH_ARGS[@]}" pwd
-
-# scp \
-#     "${SSH_BASE_ARGS[@]}" \
-#     -P "${SSH_PORT}" \
-#     -p \
-#     "${BASE_DIR}/scripts/setup-vagrant.sh" \
-#     vagrant@localhost:/tmp/setup-vagrant.sh
-
-# echo "## Running setup script ..."
-# ssh "${SSH_BASE_ARGS[@]}" "${SSH_ARGS[@]}" /tmp/setup-vagrant.sh 
-
-# echo "## Initiating shutdown ..."
-# ssh "${SSH_BASE_ARGS[@]}" "${SSH_ARGS[@]}" sudo shutdown -h +1
-
-sleep 100000
-
-# echo "## Shutting down ..."
-
-# echo 'system_powerdown' | socat - "unix-connect:${MONITOR_SOCKET}"
-# echo 'commit boot' | socat - "unix-connect:${MONITOR_SOCKET}"
-
-# kill_process "${VM_PID}"
-
-# echo "## Resizing box image ..."
-
-# qemu-img rebase -p -b '' "${BOX_IMAGE}"
-
-# # NB 1073741824 = 1024^3
-# IMG_SIZE=$(qemu-img info --output=json "${BOX_IMAGE}" | jq -r '."virtual-size"|. / 1073741824 | floor')
-
-# echo "## Creating Vagrant box ..."
-
-# jq --null-input \
-#     --from-file templates/metadata.jq \
-#     --arg arch "${OS_ARCH}" \
-#     --argjson size "${IMG_SIZE}" \
-#     >"${BOX_DIR}/metadata.json"
-
-# cp \
-#     "${BASE_DIR}/templates/Vagrantfile" \
-#     "${BASE_DIR}/templates/info.json" \
-#     "${BOX_DIR}/"
