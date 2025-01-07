@@ -16,6 +16,7 @@ crash.log
 *.box
 
 .temp/
+.archive/
 .DS_Store
 packer/conf/local.pkrvars.hcl
 packer/output/

@@ -5,19 +5,19 @@ set -euo pipefail
 SELF_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASE_DIR="${SELF_DIR}/.."
 TEMP_DIR="${BASE_DIR}/.temp"
+BUILD_DIR="${TEMP_DIR}/build"
+BOX_DIR="${BUILD_DIR}/box"
+VMCONF_JSON="${TEMP_DIR}/vm-conf.json"
 
-pushd "${TEMP_DIR}" >/dev/null
-
-BOX_DIR=box
-SETUP_JSON=setup.json
-
-BOX_VERSION=$(jq <"${SETUP_JSON}" -r '.version')
-BOX_ARCHITECTURE=$(jq <"${SETUP_JSON}" -r '.architecture')
-
-echo "## Building box for Amazon Linux 2023 ${BOX_VERSION} ${BOX_ARCHITECTURE}"
-
+rm -rf "${BUILD_DIR:?}"/*
 mkdir -p "${BOX_DIR}"
-rm -rf "${BOX_DIR:?}"/*
+
+pushd "${BUILD_DIR}" >/dev/null
+
+VERSION=$(jq <"${VMCONF_JSON}" -r '.version')
+ARCHITECTURE=$(jq <"${VMCONF_JSON}" -r '.architecture')
+
+echo "## Building box for Amazon Linux 2023 ${VERSION} ${ARCHITECTURE}"
 
 echo "## Creating box image ..."
 
@@ -32,7 +32,7 @@ echo "## Creating Vagrant box ..."
 GBSIZE=1073741824
 IMG_SIZE=$(qemu-img info --output=json "${BOX_IMAGE}" | jq -r --argjson gb "${GBSIZE}" '."virtual-size"|./$gb|floor')
 
-jq <"${SETUP_JSON}" \
+jq <"${VMCONF_JSON}" \
     --from-file "${BASE_DIR}/templates/metadata.jq" \
     --argjson size "${IMG_SIZE}" \
     >"${BOX_DIR}/metadata.json"
@@ -42,7 +42,7 @@ cp \
     "${BASE_DIR}/templates/info.json" \
     "${BOX_DIR}/"
 
-ARCHIVE_NAME="box.tgz"
+ARCHIVE_NAME="vagrant.box"
 CHECKSUM_NAME="${ARCHIVE_NAME}.sha256"
 
 rm -f "${ARCHIVE_NAME}" "${CHECKSUM_NAME}"

@@ -5,17 +5,18 @@ set -euo pipefail
 SELF_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASE_DIR="${SELF_DIR}/.."
 TEMP_DIR="${BASE_DIR}/.temp"
+BUILD_DIR="${TEMP_DIR}/build"
+VMCONF_JSON="${TEMP_DIR}/vm-conf.json"
 
 if [[ -f "${BASE_DIR}/.env" ]]; then
     # shellcheck source=/dev/null
     source "${BASE_DIR}/.env"
 fi
 
-pushd "${TEMP_DIR}" >/dev/null
+pushd "${BUILD_DIR}" >/dev/null
 
-SETUP_JSON=setup.json
-VERSION=$(jq <"${SETUP_JSON}" -r '.version')
-ARCHITECTURE=$(jq <"${SETUP_JSON}" -r '.architecture')
+VERSION=$(jq <"${VMCONF_JSON}" -r '.version')
+ARCHITECTURE=$(jq <"${VMCONF_JSON}" -r '.architecture')
 
 echo "## Publishing box for Amazon Linux 2023 ${VERSION} ${ARCHITECTURE}"
 
@@ -35,7 +36,7 @@ ACCESS_TOKEN=$(jq <"${HCP_CREDENTIALS_JSON}" -r '.access_token')
 
 REGISTRY=paullalonde
 BOX=amazon-linux-2023
-ARCHIVE_NAME="box.tgz"
+ARCHIVE_NAME="vagrant.box"
 PROVIDER=$(jq <box/metadata.json -r '.provider')
 
 echo "## Creating Version ..."
