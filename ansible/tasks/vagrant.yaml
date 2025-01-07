@@ -1,0 +1,50 @@
+---
+
+- name: Vagrant group
+  ansible.builtin.group:
+    name: vagrant
+    state: present
+  
+- name: Vagrant user
+  ansible.builtin.user:
+    name: vagrant
+    password: "{{ 'vagrant' | password_hash('sha512') }}"
+    group: vagrant
+    shell: /bin/bash
+    home: /home/vagrant
+    createhome: yes
+    state: present
+    password_lock: false
+
+- name: Vagrant SSH directory
+  ansible.builtin.file:
+    path: /home/vagrant/.ssh
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: '0700'
+  
+- name: Vagrant SSH authorized keys
+  ansible.posix.authorized_key:
+    user: vagrant
+    state: present
+    key: "{{ item }}"
+  with_file:
+    - ../keys/vagrant.pub.ed25519
+    - ../keys/vagrant.pub.rsa
+
+- name: Copy sudoers configuration for Vagrant user
+  ansible.builtin.copy:
+    src: vagrant-sudoers.conf
+    dest: /etc/sudoers.d/60-vagrant
+    owner: root
+    group: root
+    mode: '0440'
+
+- name: Copy SSH configuration for Vagrant user
+  ansible.builtin.copy:
+    src: vagrant-ssh.conf
+    dest: /etc/ssh/sshd_config.d/60-vagrant.conf
+    owner: root
+    group: root
+    mode: '0600'

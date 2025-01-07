@@ -1,0 +1,10 @@
+---
+
+all:
+  children:
+    phase1:
+      hosts:
+        phase1host:
+    phase2:
+      hosts:
+        phase2host:

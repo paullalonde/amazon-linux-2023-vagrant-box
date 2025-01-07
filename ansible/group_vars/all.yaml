@@ -1,0 +1,11 @@
+---
+
+need_sudo: false
+create_vagrant_user: false
+lockdown_root_user: false
+
+ansible_python_interpreter: /usr/bin/python3
+
+ansible_host: localhost
+ansible_port: 61384
+ansible_ssh_timeout: 300

@@ -1,0 +1,16 @@
+---
+
+- name: Generate new root password
+  ansible.builtin.set_fact:
+    root_password: "{{ lookup('ansible.builtin.password', '/dev/null') }}"
+
+- name: Change root password and lock it
+  ansible.builtin.user:
+    name: root
+    password: "{{ root_password | password_hash('sha512') }}"
+    password_lock: true
+
+- name: Delete root user's authorized keys
+  ansible.builtin.file:
+    path: /root/.ssh/authorized_keys
+    state: absent

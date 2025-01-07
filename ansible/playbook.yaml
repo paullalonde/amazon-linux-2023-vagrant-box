@@ -1,0 +1,18 @@
+- hosts: all
+  become: "{{ need_sudo }}"
+
+  tasks:
+
+    - name: Setup Vagrant user
+      ansible.builtin.include_tasks: tasks/vagrant.yaml
+      when: create_vagrant_user
+
+    - name: Lock down root user
+      ansible.builtin.include_tasks: tasks/root.yaml
+      when: lockdown_root_user
+
+    - name: Prevent cloud-init from running on subsequent boots
+      ansible.builtin.file:
+        path: /etc/cloud/cloud-init.disabled
+        state: touch
+        mode: '0444'
