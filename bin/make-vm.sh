@@ -81,9 +81,14 @@ case "${ARCHITECTURE}" in
         QEMU_BINARY_NAME=qemu-system-aarch64
         ;;
     
+    X86_64)
+        BOOT_CODE_NAME="edk2-x86_64-code.fd"
+        BOOT_VARS_NAME="edk2-arm-vars.fd"
+        QEMU_BINARY_NAME=qemu-system-x86_64
+        ;;
+    
     *)
-        BOOT_CODE_NAME="edk2-${ARCHITECTURE}-code.fd"
-        QEMU_BINARY_NAME=qemu-system-${ARCHITECTURE}
+        usage
         ;;
 esac
 
