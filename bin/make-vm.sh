@@ -96,7 +96,7 @@ QEMU_BINARY="${BREW_PREFIX}/bin/${QEMU_BINARY_NAME}"
 
 IMAGE_DIR="${IMAGE_DIR:-${HOME}/Downloads}"
 IMAGE_NAME=$(jq <"${VMCONF_JSON}" -r '"al2023-kvm-\(.version)-kernel-6.1-\(.architecture).xfs.gpt.qcow2"')
-IMAGE_URL=$(jq <"${VMCONF_JSON}" -r --arg name "${IMAGE_NAME}" '"https://cdn.amazonlinux.com/al2023/os-images/\(.version)/kvm-\(.architecture)/\($name)"')
+# IMAGE_URL=$(jq <"${VMCONF_JSON}" -r --arg name "${IMAGE_NAME}" '"https://cdn.amazonlinux.com/al2023/os-images/\(.version)/kvm-\(.architecture)/\($name)"')
 IMAGE_PATH="${IMAGE_DIR}/${IMAGE_NAME}"
 
 echo "## Copying source disk image ..."
