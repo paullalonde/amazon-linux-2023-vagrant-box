@@ -79,12 +79,14 @@ case "${ARCHITECTURE}" in
         BOOT_CODE_NAME="edk2-aarch64-code.fd"
         BOOT_VARS_NAME="edk2-arm-vars.fd"
         QEMU_BINARY_NAME=qemu-system-aarch64
+        KVM_DIR="kvm-${ARCHITECTURE}"
         ;;
     
     X86_64)
         BOOT_CODE_NAME="edk2-x86_64-code.fd"
         BOOT_VARS_NAME="edk2-arm-vars.fd"
         QEMU_BINARY_NAME=qemu-system-x86_64
+        KVM_DIR="kvm"
         ;;
     
     *)
@@ -94,17 +96,14 @@ esac
 
 QEMU_BINARY="${BREW_PREFIX}/bin/${QEMU_BINARY_NAME}"
 
-IMAGE_DIR="${IMAGE_DIR:-${HOME}/Downloads}"
 IMAGE_NAME=$(jq <"${VMCONF_JSON}" -r '"al2023-kvm-\(.version)-kernel-6.1-\(.architecture).xfs.gpt.qcow2"')
-# IMAGE_URL=$(jq <"${VMCONF_JSON}" -r --arg name "${IMAGE_NAME}" '"https://cdn.amazonlinux.com/al2023/os-images/\(.version)/kvm-\(.architecture)/\($name)"')
-IMAGE_PATH="${IMAGE_DIR}/${IMAGE_NAME}"
+IMAGE_PATH="${BASE_DIR}/downloads/${VERSION}/${KVM_DIR}/${IMAGE_NAME}"
 
 echo "## Copying source disk image ..."
 
 DISK_IMAGE="${TEMP_DIR}/disk.qcow2"
 cp -X "${IMAGE_PATH}" "${DISK_IMAGE}"
 chmod 644 "${DISK_IMAGE}"
-xattr -d com.apple.quarantine "${DISK_IMAGE}"
 
 BOOT_CODE="${TEMP_DIR}/${BOOT_CODE_NAME}"
 BOOT_VARS="${TEMP_DIR}/${BOOT_VARS_NAME}"
